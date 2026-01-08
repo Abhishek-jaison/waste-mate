@@ -1,1 +1,1 @@
-# Watemate
+# Wastemate
