@@ -138,13 +138,14 @@ model = None
 
 def load_model():
     global model
+    if model is not None:
+        return
+        
     if os.path.exists(MODEL_PATH):
         model = YOLO(MODEL_PATH)
         print(f"Model loaded from {MODEL_PATH}")
     else:
         print(f"WARNING: Model not found at {MODEL_PATH}")
-
-load_model()
 
 # ========================== Explicit Static Routes ==========================
 @app.route("/static/uploads/<filename>")
@@ -165,6 +166,10 @@ def detect():
     if file.filename == "":
         return jsonify({"error": "No file selected"}), 400
 
+    # Lazy-load the model on first request to prevent Render port binding timeouts
+    if model is None:
+        load_model()
+        
     if model is None:
         return jsonify({"error": "Model not loaded. Train the model first."}), 503
 
