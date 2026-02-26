@@ -12,6 +12,9 @@ from ultralytics import YOLO
 app = Flask(__name__, static_folder="../frontend/dist")
 CORS(app)
 
+# Load the model directly so Gunicorn triggers it when loading the app.
+load_model_on_startup = True
+
 # ========================== Configuration ==========================
 UPLOAD_FOLDER = Path("static/uploads")
 RESULT_FOLDER = Path("static/results")
@@ -140,6 +143,8 @@ def load_model():
         print(f"Model loaded from {MODEL_PATH}")
     else:
         print(f"WARNING: Model not found at {MODEL_PATH}")
+
+load_model()
 
 # ========================== Explicit Static Routes ==========================
 @app.route("/static/uploads/<filename>")
