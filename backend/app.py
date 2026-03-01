@@ -145,10 +145,13 @@ def load_model():
         return
         
     if os.path.exists(MODEL_PATH):
-        model = YOLO(MODEL_PATH)
+        model = YOLO(MODEL_PATH, task="detect")
         print(f"Model loaded from {MODEL_PATH}")
     else:
         print(f"WARNING: Model not found at {MODEL_PATH}")
+
+# Force enthusiastic load at startup when Gunicorn boots
+load_model()
 
 # ========================== Explicit Static Routes ==========================
 @app.route("/static/uploads/<filename>")
