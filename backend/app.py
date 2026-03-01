@@ -23,9 +23,12 @@ RESULT_FOLDER.mkdir(parents=True, exist_ok=True)
 
 MODEL_PATH = os.environ.get(
     "MODEL_PATH",
-    "wastesort-yolov8/wastesort-v13/weights/best.pt"
+    "wastesort-yolov8/wastesort-v13/weights/best.onnx"
 )
 
+# Fallback to the .pt file if the ONNX version hasn't been generated yet
+if not os.path.exists(MODEL_PATH) and os.path.exists("wastesort-yolov8/wastesort-v13/weights/best.pt"):
+    MODEL_PATH = "wastesort-yolov8/wastesort-v13/weights/best.pt"
 CONFIDENCE_THRESHOLD = float(os.environ.get("CONFIDENCE", "0.25"))
 
 CLASS_NAMES = {

@@ -1,0 +1,81 @@
+# WasteMate
+
+WasteMate is an AI-powered waste detection and sorting application. It uses a YOLOv8 object detection model to identify different types of waste from uploaded images and provides actionable recycling suggestions to the user. The project features a React frontend and a Flask (Python) backend serving the machine learning model.
+
+## Features
+
+- **Waste Detection**: Identifies waste categories including PET, PEAD, Mixed Plastics, ECAL, Metal, and Cardboard using a fine-tuned YOLOv8 model.
+- **Actionable Advice**: Provides recycling tips and specifies the appropriate bins for the detected waste items.
+- **Integrated Architecture**: A Flask backend that serves both the YOLO inference API and the pre-built React frontend.
+
+## Project Structure
+
+- `frontend/`: Contains the React application built with Vite and Tailwind CSS.
+- `backend/`: Contains the Python Flask application, YOLO model weights, and the API logic.
+    - `backend/app.py`: Main backend entry point. Provides the `/detect` endpoint and serves the React UI.
+    - `backend/requirements.txt`: Python dependencies.
+
+## Prerequisites
+
+- Python 3.8+
+- Node.js and npm (for frontend building)
+
+## Installation & Setup
+
+### 1. Build the Frontend
+
+Since the Flask backend serves the compiled React application, you need to build the frontend first.
+
+```bash
+cd frontend
+npm install
+npm run build
+```
+This will compile the frontend assets into the `frontend/dist` directory.
+
+### 2. Setup the Backend
+
+Create a Python virtual environment and install the required dependencies.
+
+```bash
+cd ../backend
+
+# Create virtual environment (optional but recommended)
+python -m venv venv
+# On Windows use: venv\Scripts\activate
+# On Linux/macOS use: source venv/bin/activate
+venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 3. Run the Application
+
+Start the Flask server. It will serve both the backend API and the frontend UI.
+
+```bash
+python app.py
+```
+
+The application will be accessible at `http://localhost:5000` (or whichever port Render/Flask assigns).
+
+## API Endpoints
+
+- **`POST /detect`**: Upload an image (`multipart/form-data` with an `image` field) to receive YOLO detection boxes, annotated output, confidence scores, and recycling suggestions.
+- **`GET /static/uploads/<filename>`**: Get the original uploaded image.
+- **`GET /static/results/<filename>`**: Get the image with YOLO bounding boxes drawn over it.
+
+## How it Works
+
+1. **User interaction**: Users access the web interface and upload an image of a waste item.
+2. **Inference**: The frontend sends the image to the `/detect` API endpoint.
+3. **Detection**: The Flask app uses the YOLOv8 model to perform object detection, drawing bounding boxes on the image and returning detected classes with confidence scores.
+4. **Suggestions**: The returned JSON includes specific recycling instructions mapped to the detected classes.
+5. **Presentation**: The annotated image and recycling information are displayed on the React UI.
+
+## Technologies Used
+
+- **Frontend**: React, Vite, Tailwind CSS
+- **Backend**: Python, Flask, Flask-CORS
+- **Machine Learning**: Ultralytics YOLOv8, OpenCV, PyTorch
