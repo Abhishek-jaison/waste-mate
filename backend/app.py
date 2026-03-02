@@ -18,10 +18,10 @@ import numpy as np
 from ultralytics import YOLO
 
 app = Flask(__name__, static_folder="../frontend/dist")
-CORS(app)
+import threading
 
 # Load the model directly so Gunicorn triggers it when loading the app.
-load_model_on_startup = True
+# load_model_on_startup = True  # Disabled to prevent Gunicorn timeout
 
 # ========================== Configuration ==========================
 UPLOAD_FOLDER = Path("static/uploads")
@@ -152,14 +152,17 @@ def load_model():
     if model is not None:
         return
         
-    if os.path.exists(MODEL_PATH):
-        model = YOLO(MODEL_PATH, task="detect")
-        print(f"Model loaded from {MODEL_PATH}")
-    else:
-        print(f"WARNING: Model not found at {MODEL_PATH}")
+    try:
+        if os.path.exists(MODEL_PATH):
+            model = YOLO(MODEL_PATH, task="detect")
+            print(f"Model loaded from {MODEL_PATH}")
+        else:
+            print(f"WARNING: Model not found at {MODEL_PATH}")
+    except Exception as e:
+        print(f"Error loading model: {e}")
 
-# Force enthusiastic load at startup when Gunicorn boots
-load_model()
+# Load model in a background thread to prevent Gunicorn timeout
+threading.Thread(target=load_model, daemon=True).start()
 
 # ========================== Explicit Static Routes ==========================
 @app.route("/static/uploads/<filename>")
