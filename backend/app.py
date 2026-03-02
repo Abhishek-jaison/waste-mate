@@ -1,7 +1,15 @@
 import os
 import io
 import uuid
+import gc
 from pathlib import Path
+
+# Restrict threading to save memory on free tiers like Render
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
 
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
@@ -237,6 +245,12 @@ def detect():
             "tips": info.get("tips", []),
             "recyclable": info.get("recyclable", False),
         })
+
+    # Aggressive garbage collection to free memory
+    del results
+    del result
+    del img
+    gc.collect()
 
     return jsonify({
         "annotated_image": f"/static/results/{result_filename}",
